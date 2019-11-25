@@ -2,20 +2,19 @@ import { Action } from 'redux';
 import { SnippetsActions, ActionTypes } from '@/actions/SnippetsActions';
 import Snippet from '@/models/Snippet';
 
-const initialState: SnippetsState = {};
-
 export interface SnippetsState {
-  [extension: string]: Snippet[]
+  [extension: string]: Snippet[];
 }
 
-export function snippetsReducer(state = initialState, action: SnippetsActions) {
+export function snippetsReducer(snippetsState: SnippetsState = {}, action: SnippetsActions) {
   switch (action.type) {
     case ActionTypes.ADD_SNIPPET:
+      const extension: string = action.payload.extension;
       return {
-        ...state,
-        snippets: state[action.payload.extension].concat([action.payload.snippet])
+        ...snippetsState,
+        [extension]: (snippetsState[extension] || []).concat([action.payload.snippet])
       };
     default:
-      return state;
+      return snippetsState;
   }
 }

@@ -1,11 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import './index.css';
-import App from './App';
-import SnippetForm from './components/SnippetForm';
+import SnippetForm from './containers/SnippetForm';
+import store from './store';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<SnippetForm />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <SnippetForm />
+  </Provider>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
