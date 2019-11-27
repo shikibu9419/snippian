@@ -1,9 +1,7 @@
 import React from 'react';
-import { saveFile } from '@/utils/FileSystem';
-import Snippet from '@/models/Snippet';
 import { SnippetsState } from '@/reducers/SnippetsReducer';
 import { SnippetsActions } from '@/containers/SnippetForm';
-
+import { exportAsToml } from '@/services/ExportService';
 
 interface FormState {
   name?: string;
@@ -12,12 +10,11 @@ interface FormState {
   body?: string;
 }
 
-type Props =  SnippetsState & SnippetsActions;
+type Props = SnippetsState & SnippetsActions;
 
-const tomlStream = require('toml-stream');
 const spaceCount = 4;
 
-
+//// function component ver.
 // const SnippetForm: React.SFC<Props> = (props: React.PropsWithChildren<Props>) => {
 //   return (
 //     <div className="form-wrapper">
@@ -106,16 +103,10 @@ export default class SnippetForm extends React.Component<Props, FormState> {
     }
   };
 
-  exportToToml = (e: any) => {
-    console.log(this.props)
+  exportData = (e: any) => {
     this.props.addSnippet!('latex', this.state);
-
-    tomlStream.toTOMLString(this.state, (error: any, output: string) => {
-      if (error) {
-        throw error;
-      }
-      saveFile('hoge.toml', output);
-    })
+    console.log(this.props)
+    exportAsToml(this.props.snippets);
   };
 
   render() {
@@ -125,7 +116,7 @@ export default class SnippetForm extends React.Component<Props, FormState> {
         <input type="text" style={{ height: '100%', width: '100%' }} name="prefix" value={this.state.prefix} onChange={this.handleChange} />
         <input type="text" style={{ height: '100%', width: '100%' }} name="description" value={this.state.description} onChange={this.handleChange} />
         <textarea style={{ height: '100%', width: '100%' }} name="body" value={this.state.body} onChange={this.handleChange} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
-        <button onClick={this.exportToToml}>export</button>
+        <button onClick={this.exportData}>export</button>
       </div>
     )
   }
