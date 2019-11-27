@@ -16,7 +16,6 @@ type Props =  SnippetsState & SnippetsActions;
 
 const tomlStream = require('toml-stream');
 const spaceCount = 4;
-var shiftPressed = false;
 
 
 // const SnippetForm: React.SFC<Props> = (props: React.PropsWithChildren<Props>) => {
@@ -35,6 +34,8 @@ var shiftPressed = false;
 
 
 export default class SnippetForm extends React.Component<Props, FormState> {
+  shiftPressed = false;
+
   state = {
     name: '',
     body: '',
@@ -46,34 +47,62 @@ export default class SnippetForm extends React.Component<Props, FormState> {
 
   handleKeyDown = (e:any) => {
     if (e.key === 'Shift') {
-      shiftPressed = true;
+      this.shiftPressed = true;
     }
 
     if (e.key === 'Tab' && e.keyCode !== 229) {
       e.preventDefault();
 
-//       const textareaElement = e.target;
-//       const currentText = textareaElement.value;
-//
-//       const start = textareaElement.selectionStart;
-//       const end = textareaElement.selectionEnd;
-//
-//       const substitution = Array(spaceCount + 1).join(' ');
-//
-//       const newText = currentText.substring(0, start) + substitution + currentText.substring(end, currentText.length);
-//
-//       this.setState({
-//         text: newText,
-//       }, () => {
-//         textareaElement.setSelectionRange(start + spaceCount, start + spaceCount);
-//       });
+      const element = e.target;
+      const currentText = element.value;
+      let start = element.selectionStart;
+      let end = element.selectionEnd;
+
+      let head = currentText.slice(0, start);
+      let middle = currentText.slice(start, end);
+      const tail = currentText.slice(end);
+
+      const indent = Array(spaceCount + 1).join(' ');
+      const nearestLFIndex = head.lastIndexOf('\n');
+
+      if (this.shiftPressed) {
+        const matchHead = new RegExp('^' + indent, 'g');
+        const matchLF = new RegExp('\n' + indent, 'g');
+        const insertCount = (middle.match(matchLF) || []).length;
+
+        head = nearestLFIndex >= 0
+          ? head.slice(0, nearestLFIndex) + head.slice(nearestLFIndex).replace(matchLF, '\n')
+          : head.replace(matchHead, '');
+        middle = middle.replace(matchLF, '\n');
+
+        start -= spaceCount;
+        end -= insertCount * spaceCount;
+      } else {
+        const insertIndex = nearestLFIndex + 1;
+        const deleteCount = (middle.match(/\n/g) || []).length + 1;
+
+        head = head.slice(0, insertIndex) + indent + head.slice(insertIndex);
+        middle = middle.replace(/\n/g, '\n' + indent);
+
+        start += spaceCount;
+        end += deleteCount * spaceCount;
+      }
+
+      this.setState(
+        {
+          body: head + middle + tail
+        },
+        () => {
+          element.setSelectionRange(start, end);
+        }
+      );
     }
   };
 
 
   handleKeyUp = (e: any) => {
     if (e.key === 'Shift') {
-      shiftPressed = false;
+      this.shiftPressed = false;
     }
   };
 
