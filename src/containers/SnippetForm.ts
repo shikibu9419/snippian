@@ -11,7 +11,7 @@ export interface SnippetsActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  return appState.snippets;
+  return { snippets: appState.snippets };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Action<string>>) {

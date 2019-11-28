@@ -1,4 +1,3 @@
-import { Action } from 'redux';
 import { SnippetsActions, ActionTypes } from '@/actions/SnippetsActions';
 import Snippet from '@/models/Snippet';
 

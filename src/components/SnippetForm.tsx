@@ -2,6 +2,7 @@ import React from 'react';
 import { SnippetsState } from '@/reducers/SnippetsReducer';
 import { SnippetsActions } from '@/containers/SnippetForm';
 import { exportAsToml } from '@/services/ExportService';
+import { getIndentedTextElem } from '@/utils/FormExtension';
 
 interface FormState {
   name?: string;
@@ -11,8 +12,6 @@ interface FormState {
 }
 
 type Props = SnippetsState & SnippetsActions;
-
-const spaceCount = 4;
 
 //// function component ver.
 // const SnippetForm: React.SFC<Props> = (props: React.PropsWithChildren<Props>) => {
@@ -40,7 +39,9 @@ export default class SnippetForm extends React.Component<Props, FormState> {
     description: '',
   };
 
-  handleChange = (e: any) => (this.setState({[e.target.name]: e.target.value}));
+  handleChange = (e: any) => {
+    this.setState({[e.target.name]: e.target.value});
+  };
 
   handleKeyDown = (e:any) => {
     if (e.key === 'Shift') {
@@ -50,47 +51,15 @@ export default class SnippetForm extends React.Component<Props, FormState> {
     if (e.key === 'Tab' && e.keyCode !== 229) {
       e.preventDefault();
 
-      const element = e.target;
-      const currentText = element.value;
-      let start = element.selectionStart;
-      let end = element.selectionEnd;
-
-      let head = currentText.slice(0, start);
-      let middle = currentText.slice(start, end);
-      const tail = currentText.slice(end);
-
-      const indent = Array(spaceCount + 1).join(' ');
-      const nearestLFIndex = head.lastIndexOf('\n');
-
-      if (this.shiftPressed) {
-        const matchHead = new RegExp('^' + indent, 'g');
-        const matchLF = new RegExp('\n' + indent, 'g');
-        const insertCount = (middle.match(matchLF) || []).length;
-
-        head = nearestLFIndex >= 0
-          ? head.slice(0, nearestLFIndex) + head.slice(nearestLFIndex).replace(matchLF, '\n')
-          : head.replace(matchHead, '');
-        middle = middle.replace(matchLF, '\n');
-
-        start -= spaceCount;
-        end -= insertCount * spaceCount;
-      } else {
-        const insertIndex = nearestLFIndex + 1;
-        const deleteCount = (middle.match(/\n/g) || []).length + 1;
-
-        head = head.slice(0, insertIndex) + indent + head.slice(insertIndex);
-        middle = middle.replace(/\n/g, '\n' + indent);
-
-        start += spaceCount;
-        end += deleteCount * spaceCount;
-      }
+      const elem = e.target;
+      const newElem = getIndentedTextElem(elem, this.shiftPressed);
 
       this.setState(
         {
-          body: head + middle + tail
+          body: newElem.text
         },
         () => {
-          element.setSelectionRange(start, end);
+          elem.setSelectionRange(...newElem.selectionRange);
         }
       );
     }
