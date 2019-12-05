@@ -1,14 +1,14 @@
 {
-    "compilerOptions": {
-        "baseUrl": "src/",
-        "paths": {
-            "@/components/*" : ["./components/*"],
-            "@/reducers/*" : ["./reducers/*"],
-            "@/actions/*" : ["./actions/*"],
-            "@/containers/*" : ["./containers/*"],
-            "@/models/*" : ["./models/*"],
-            "@/services/*" : ["./services/*"],
-            "@/utils/*" : ["./utils/*"]
-        }
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "paths": {
+      "@/components/*" : ["./components/*"],
+      "@/reducers/*" : ["./reducers/*"],
+      "@/actions/*" : ["./actions/*"],
+      "@/containers/*" : ["./containers/*"],
+      "@/models/*" : ["./models/*"],
+      "@/services/*" : ["./services/*"],
+      "@/utils/*" : ["./utils/*"]
     }
+  }
 }
