@@ -1,13 +1,16 @@
 import { createStore, combineReducers } from 'redux';
 import { snippetsReducer, SnippetsState } from '@/reducers/SnippetsReducer';
+import { sidebarReducer, SidebarState } from '@/reducers/SidebarReducer';
 
 export type AppState = {
-  snippets: SnippetsState
+  snippets: SnippetsState,
+  sidebar: SidebarState,
 };
 
 const store = createStore(
   combineReducers<AppState>({
-    snippets: snippetsReducer
+    snippets: snippetsReducer,
+    sidebar: sidebarReducer
   })
 );
 

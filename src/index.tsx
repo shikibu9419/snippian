@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import './index.css';
+import Sidebar from './containers/Sidebar';
 import SnippetForm from './containers/SnippetForm';
 import store from './store';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <Provider store={store}>
+    <Sidebar />
     <SnippetForm />
   </Provider>,
   document.getElementById('root')
