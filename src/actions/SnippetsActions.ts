@@ -2,23 +2,23 @@ import { Action } from 'redux';
 import Snippet from '@/models/Snippet';
 
 export enum ActionTypes {
-  ADD_SNIPPET = 'ADD_SNIPPET'
+  UPDATE_SNIPPET = 'UPDATE_SNIPPET'
 }
 
-interface AddSnippetAction extends Action {
-  type: ActionTypes.ADD_SNIPPET;
+interface UpdateSnippetAction extends Action {
+  type: ActionTypes.UPDATE_SNIPPET;
   payload: {
     extension: string;
     snippet: Snippet;
   };
 }
 
-export const addSnippet = (
+export const updateSnippet = (
   extension: string,
   snippet: Snippet
-): AddSnippetAction => ({
-  type: ActionTypes.ADD_SNIPPET,
+): UpdateSnippetAction => ({
+  type: ActionTypes.UPDATE_SNIPPET,
   payload: { extension, snippet }
 });
 
-export type SnippetsActions = AddSnippetAction;
+export type SnippetsActions = UpdateSnippetAction;

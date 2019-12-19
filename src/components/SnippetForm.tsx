@@ -1,6 +1,6 @@
 import React from 'react';
 import { SnippetsState } from '@/reducers/SnippetsReducer';
-import { SnippetsActions } from '@/containers/SnippetForm';
+import { SnippetsActions, OwnState } from '@/containers/SnippetForm';
 import { exportAsToml } from '@/services/ExportService';
 import { getIndentedTextElem } from '@/utils/FormExtension';
 

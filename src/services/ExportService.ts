@@ -9,5 +9,7 @@ export function exportAsToml(data: any) {
     saveFile('hoge.toml', output);
   })
 }
+
 export function exportToVSCode() {}
+
 export function exportToVim() {}
