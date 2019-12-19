@@ -8,9 +8,14 @@ type Props = SidebarState & SidebarActions;
 const Sidebar: React.FC<Props> = (props: React.PropsWithChildren<Props>) => {
   const options = props.extensions.map((e: string) => ({value: e, label: e}));
 
-  const handleChange = (extension: any) => {
-    if (!extension) { return; }
-    props.addExtension!(extension.value);
+  const handleChange = (e: any) => {
+    if (!e) { return; }
+
+    const extension = e.value;
+    if (!props.extensions.includes(extension)) {
+      props.addExtension!(extension);
+    }
+    props.selectExtension!(extension);
   };
 
   return (

@@ -3,6 +3,7 @@ import { SnippetsState } from '@/reducers/SnippetsReducer';
 import { SnippetsActions, OwnState } from '@/containers/SnippetForm';
 import { exportAsToml } from '@/services/ExportService';
 import { getIndentedTextElem } from '@/utils/FormExtension';
+import { debounce } from 'lodash';
 
 interface FormState {
   name?: string;
@@ -11,82 +12,67 @@ interface FormState {
   body?: string;
 }
 
-type Props = SnippetsState & SnippetsActions;
+type Props = SnippetsState & OwnState & SnippetsActions;
 
-//// function component ver.
-// const SnippetForm: React.SFC<Props> = (props: React.PropsWithChildren<Props>) => {
-//   return (
-//     <div className="form-wrapper">
-//       <input type="text" style={{ height: '100%', width: '100%' }} name="name" value={props.snippet.name} onChange={(e) => props.inputForm(e)} />
-//       <input type="text" style={{ height: '100%', width: '100%' }} name="prefix" value={props.snippet.prefix} onChange={(e) => props.inputForm(e)} />
-//       <input type="text" style={{ height: '100%', width: '100%' }} name="description" value={props.snippet.description} onChange={(e) => props.inputForm(e)} />
-//       <textarea style={{ height: '100%', width: '100%' }} name="body" value={props.snippet.body} onChange={(e) => props.inputForm(e)} />
-//       <button onClick={(e) => exportToToml(props.snippets)}>export</button>
-//     </div>
-//   );
-// }
-//
-// export default SnippetForm;
-
-
-export default class SnippetForm extends React.Component<Props, FormState> {
-  shiftPressed = false;
-
-  state = {
+const SnippetForm: React.FC<Props> = (props: React.PropsWithChildren<Props>) => {
+  const [snippet, setSnippet] = React.useState({
     name: '',
     body: '',
     prefix: '',
     description: '',
-  };
+  });
 
-  handleChange = (e: any) => {
-    this.setState({[e.target.name]: e.target.value});
-  };
+  const [shiftPressed, setShiftPressed] = React.useState(false)
 
-  handleKeyDown = (e:any) => {
+  const debouncedHandleChange = debounce((target: any) => {
+    setSnippet({...snippet, [target.name]: target.value});
+    props.updateSnippet!(props.extension, snippet);
+  }, 300);
+
+  const handleChange = React.useCallback((e: any) => debouncedHandleChange(e.target), []);
+
+  const handleKeyDown = (e:any) => {
     if (e.key === 'Shift') {
-      this.shiftPressed = true;
+      setShiftPressed(true);
     }
 
     if (e.key === 'Tab' && e.keyCode !== 229) {
       e.preventDefault();
 
       const elem = e.target;
-      const newElem = getIndentedTextElem(elem, this.shiftPressed);
+      const newElem = getIndentedTextElem(elem, shiftPressed);
 
-      this.setState(
+      setSnippet(
         {
+          ...snippet,
           body: newElem.text
         },
-        () => {
-          elem.setSelectionRange(...newElem.selectionRange);
-        }
+//         () => {
+//           elem.setSelectionRange(...newElem.selectionRange);
+//         }
       );
     }
   };
 
-
-  handleKeyUp = (e: any) => {
+  const handleKeyUp = (e: any) => {
     if (e.key === 'Shift') {
-      this.shiftPressed = false;
+      setShiftPressed(false);
     }
   };
 
-  exportData = (e: any) => {
-    this.props.addSnippet!('latex', this.state);
-    console.log(this.props)
-    exportAsToml(this.props.snippets);
+  const exportData = (e: any) => {
+    exportAsToml(props.snippets);
   };
 
-  render() {
-    return (
+  return (
       <div className="form-wrapper">
-        <input type="text" style={{ height: '100%', width: '100%' }} name="name" value={this.state.name} onChange={this.handleChange} />
-        <input type="text" style={{ height: '100%', width: '100%' }} name="prefix" value={this.state.prefix} onChange={this.handleChange} />
-        <input type="text" style={{ height: '100%', width: '100%' }} name="description" value={this.state.description} onChange={this.handleChange} />
-        <textarea style={{ height: '100%', width: '100%' }} name="body" value={this.state.body} onChange={this.handleChange} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
-        <button onClick={this.exportData}>export</button>
+        <input type="text" style={{ height: '100%', width: '100%' }} name="name" value={snippet.name} onChange={handleChange} />
+        <input type="text" style={{ height: '100%', width: '100%' }} name="prefix" value={snippet.prefix} onChange={handleChange} />
+        <input type="text" style={{ height: '100%', width: '100%' }} name="description" value={snippet.description} onChange={handleChange} />
+        <textarea style={{ height: '100%', width: '100%' }} name="body" value={snippet.body} onChange={handleChange} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} />
+        <button onClick={exportData}>export</button>
       </div>
-    )
-  }
+  )
 }
+
+export default SnippetForm;
